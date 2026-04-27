@@ -1,0 +1,10 @@
+# Factorio mod zips (build artifacts)
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/

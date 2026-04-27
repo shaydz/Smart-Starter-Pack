@@ -1,0 +1,14 @@
+{
+  "name": "smart-starter-pack",
+  "version": "1.0.0",
+  "title": "Smart Starter Pack",
+  "author": "You",
+  "description": "Gives you a customized starter package depending on what other mods you have installed.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.0",
+    "? aai-loaders",
+    "? Mining_Drones_Remastered",
+    "? Krastorio2"
+  ]
+}
