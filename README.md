@@ -4,7 +4,9 @@ A Factorio 2.0 mod that gives you a customized starter package based on what oth
 
 ## Features
 
-- **Always given** — 200 Repair Packs
+All starter items, their counts, and whether armor is given can be customized in Factorio's in-game **Settings -> Mod settings** menu. By default, the packs include:
+
+- **Universal** — 200 Repair Packs
 - **[Krastorio 2](https://mods.factorio.com/mod/Krastorio2)** — Power Armor pre-loaded with generators, roboports, batteries & solar panels + 50 Construction Robots
 - **[Mining Drones Remastered](https://mods.factorio.com/mod/Mining_Drones_Remastered)** — Unlocks the mining drone technology and gives 200 Mining Drones + 4 Mining Depots
 - **[AAI Loaders](https://mods.factorio.com/mod/aai-loaders)** — 200 AAI Loaders
