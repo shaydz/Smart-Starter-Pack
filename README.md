@@ -11,6 +11,7 @@ All starter items, their counts, and whether armor is given can be customized in
 - **[Mining Drones Remastered](https://mods.factorio.com/mod/Mining_Drones_Remastered)** — Unlocks the mining drone technology and gives 200 Mining Drones + 4 Mining Depots
 - **[AAI Loaders](https://mods.factorio.com/mod/aai-loaders)** — 200 AAI Loaders
 - **Vanilla** — Modular Armor pre-fitted with a Personal Roboport, batteries & solar panels + 20 Construction Robots
+- **Krastorio 2: Free Power** *(startup setting)* — Removes the fuel requirement that K2 adds to personal equipment generators and spidertron power sources, reverting them to vanilla-style free power
 
 ## Installation
 

@@ -1,4 +1,12 @@
 data:extend({
+  -- Startup settings (require game restart)
+  {
+    type = "bool-setting",
+    name = "ssp-k2-remove-fuel-requirement",
+    setting_type = "startup",
+    default_value = true
+  },
+  -- Runtime-global settings
   {
     type = "bool-setting",
     name = "ssp-enable-universal",
