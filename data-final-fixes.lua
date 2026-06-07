@@ -111,3 +111,41 @@ if mods["space-exploration"] and settings.startup["ssp-se-multiply-landfill"].va
     end
   end
 end
+
+-- =====================================================
+-- SPACE EXPLORATION + KRASTORIO 2: Wood Recipe Revert
+-- SE heavily nerfs or alters the K2 greenhouse wood recipes.
+-- This block forcefully restores them to the K2 defaults.
+-- =====================================================
+if mods["space-exploration"] and mods["Krastorio2"] and settings.startup["ssp-se-k2-revert-wood"].value then
+  log("Smart Starter Pack: Reverting K2 greenhouse wood recipes to defaults.")
+  
+  -- 1. Standard Wood (200 water -> 40 wood over 60s)
+  local wood_recipe = data.raw.recipe["wood"]
+  if wood_recipe and wood_recipe.category == "kr-growing" then
+    wood_recipe.energy_required = 60
+    wood_recipe.ingredients = {
+      { type = "fluid", name = "water", amount = 200 }
+    }
+    wood_recipe.results = {
+      { type = "item", name = "wood", amount = 40 }
+    }
+    wood_recipe.result = nil
+    wood_recipe.result_count = nil
+  end
+
+  -- 2. Wood with Fertilizer (200 water + 1 fertilizer -> 80 wood over 60s)
+  local fert_recipe = data.raw.recipe["kr-wood-with-fertilizer"]
+  if fert_recipe then
+    fert_recipe.energy_required = 60
+    fert_recipe.ingredients = {
+      { type = "fluid", name = "water", amount = 200 },
+      { type = "item", name = "kr-fertilizer", amount = 1 }
+    }
+    fert_recipe.results = {
+      { type = "item", name = "wood", amount = 80 }
+    }
+    fert_recipe.result = nil
+    fert_recipe.result_count = nil
+  end
+end
