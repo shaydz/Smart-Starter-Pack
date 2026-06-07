@@ -90,5 +90,19 @@ data:extend({
     default_value = 20,
     minimum_value = 0,
     maximum_value = 500
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-multiply-landfill",
+    setting_type = "startup",
+    default_value = true
+  },
+  {
+    type = "int-setting",
+    name = "ssp-se-landfill-multiplier",
+    setting_type = "startup",
+    default_value = 10,
+    minimum_value = 1,
+    maximum_value = 100
   }
 })
