@@ -2,8 +2,10 @@
 -- Runs after all other mods (including Krastorio 2) have finished their data stage.
 -- Removes Krastorio 2's fuel requirements from personal equipment generators
 -- and spidertron power sources, reverting them to vanilla-style free power.
+-- Detect Krastorio 2 or Krastorio 2 Spaced Out
+local has_k2 = mods["Krastorio2"] or mods["Krastorio2-spaced-out"]
 
-if mods["Krastorio2"] and settings.startup["ssp-k2-remove-fuel-requirement"].value then
+if has_k2 and settings.startup["ssp-k2-remove-fuel-requirement"].value then
 
   -- =====================================================
   -- Personal equipment generators (generator-equipment)
@@ -42,7 +44,7 @@ end
 -- We restore both so the standard radar is no more
 -- expensive to run than it is in the base game.
 -- =====================================================
-if mods["Krastorio2"] then
+if has_k2 then
   local radar = data.raw["radar"]["radar"]
   if radar then
     log("Smart Starter Pack: reverting K2 radar power to vanilla values.")
@@ -117,7 +119,7 @@ end
 -- SE heavily nerfs or alters the K2 greenhouse wood recipes.
 -- This block forcefully restores them to the K2 defaults.
 -- =====================================================
-if mods["space-exploration"] and mods["Krastorio2"] and settings.startup["ssp-se-k2-revert-wood"].value then
+if mods["space-exploration"] and has_k2 and settings.startup["ssp-se-k2-revert-wood"].value then
   log("Smart Starter Pack: Reverting K2 greenhouse wood recipes to defaults.")
   
   -- 1. Standard Wood (200 water -> 40 wood over 60s)

@@ -2,6 +2,7 @@ script.on_event(defines.events.on_player_created, function(event)
     local player = game.players[event.player_index]
     local force = player.force
     local active_mods = script.active_mods
+    local has_k2 = active_mods["Krastorio2"] or active_mods["Krastorio2-spaced-out"]
 
     -- Attempt to find the player's character entity.
     -- (Accessing inventory via player.get_inventory() fails here because the
@@ -64,7 +65,7 @@ script.on_event(defines.events.on_player_created, function(event)
     -- ===============================================
     -- MOD: Krastorio 2
     -- ===============================================
-    if active_mods["Krastorio2"] and settings.global["ssp-enable-k2"].value then
+    if has_k2 and settings.global["ssp-enable-k2"].value then
         -- Give construction robots to main inventory
         local robot_count = settings.global["ssp-k2-robot-count"].value
         if robot_count > 0 then
@@ -107,7 +108,7 @@ script.on_event(defines.events.on_player_created, function(event)
     -- VANILLA ARMOR KIT (skipped if Krastorio 2 is active,
     -- as K2 overhauls progression and provides its own gear)
     -- ===============================================
-    if not active_mods["Krastorio2"] and settings.global["ssp-enable-vanilla-armor"].value then
+    if not has_k2 and settings.global["ssp-enable-vanilla-armor"].value then
         -- Construction robots go in the main inventory (used by the roboport)
         local robot_count = settings.global["ssp-vanilla-robot-count"].value
         if robot_count > 0 then
