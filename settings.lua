@@ -110,5 +110,11 @@ data:extend({
     name = "ssp-se-k2-revert-wood",
     setting_type = "startup",
     default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-td-streamline-techs",
+    setting_type = "startup",
+    default_value = true
   }
 })

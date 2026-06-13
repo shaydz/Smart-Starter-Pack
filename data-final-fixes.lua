@@ -151,3 +151,73 @@ if mods["space-exploration"] and has_k2 and settings.startup["ssp-se-k2-revert-w
     fert_recipe.result_count = nil
   end
 end
+
+-- =====================================================
+-- TRANSPORT DRONES (CONTINUED): Streamline Technologies
+-- Moves depot unlocks into the core transport techs and 
+-- hides the redundant intermediate technologies.
+-- =====================================================
+if mods["Transport_Drones_Continued"] and settings.startup["ssp-td-streamline-techs"].value then
+  log("Smart Starter Pack: Streamlining Transport Drones tech tree.")
+
+  local function move_unlock(recipe_name, from_tech_name, to_tech_name)
+    local from_tech = data.raw.technology[from_tech_name]
+    local to_tech = data.raw.technology[to_tech_name]
+
+    if from_tech and to_tech and from_tech.effects and to_tech.effects then
+      for i, effect in ipairs(from_tech.effects) do
+        if effect.type == "unlock-recipe" and effect.recipe == recipe_name then
+          table.remove(from_tech.effects, i)
+          table.insert(to_tech.effects, {type="unlock-recipe", recipe=recipe_name})
+          log("Smart Starter Pack: Moved " .. recipe_name .. " from " .. from_tech_name .. " to " .. to_tech_name)
+          break
+        end
+      end
+    end
+  end
+
+  local function replace_prerequisite(old_req, new_req)
+    for _, tech in pairs(data.raw.technology) do
+      if tech.prerequisites then
+        local has_new = false
+        local old_idx = nil
+        for i, req in ipairs(tech.prerequisites) do
+          if req == new_req then has_new = true end
+          if req == old_req then old_idx = i end
+        end
+        if old_idx then
+          if has_new then
+            table.remove(tech.prerequisites, old_idx)
+          else
+            tech.prerequisites[old_idx] = new_req
+          end
+        end
+      end
+    end
+  end
+
+  local function disable_tech(tech_name)
+    local tech = data.raw.technology[tech_name]
+    if tech then
+      tech.hidden = true
+      tech.enabled = false
+      log("Smart Starter Pack: Disabled redundant technology " .. tech_name)
+    end
+  end
+
+  -- Move recipes
+  move_unlock("fluid-depot", "transport-fluids", "transport-system")
+  move_unlock("buffer-depot", "transport-buffering", "transport-logistics")
+  move_unlock("active-depot", "transport-active-supply", "transport-logistics")
+  move_unlock("storage-depot", "transport-active-supply", "transport-logistics")
+
+  -- Reroute prerequisites
+  replace_prerequisite("transport-fluids", "transport-system")
+  replace_prerequisite("transport-buffering", "transport-logistics")
+  replace_prerequisite("transport-active-supply", "transport-logistics")
+
+  -- Disable empty techs
+  disable_tech("transport-fluids")
+  disable_tech("transport-buffering")
+  disable_tech("transport-active-supply")
+end
