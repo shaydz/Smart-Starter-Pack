@@ -93,6 +93,12 @@ data:extend({
   },
   {
     type = "bool-setting",
+    name = "ssp-td-default-full-stack",
+    setting_type = "runtime-global",
+    default_value = true
+  },
+  {
+    type = "bool-setting",
     name = "ssp-se-multiply-landfill",
     setting_type = "startup",
     default_value = true

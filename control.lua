@@ -144,3 +144,44 @@ script.on_event(defines.events.on_player_created, function(event)
 
     inventory.sort_and_merge()
 end)
+
+-- ===============================================
+-- MOD: Transport Drones Continued
+-- Default requester depots to "full stack only" when
+-- manually placed (not from blueprints).
+-- ===============================================
+if script.active_mods["Transport_Drones_Continued"] then
+
+    -- Entity names that are requester depots
+    local requester_depot_names = {
+        ["request-depot"] = true,
+        ["request-depot-multi"] = true,
+    }
+
+    -- Handler for when a depot is built by a player (manual placement)
+    local function on_depot_built(event)
+        if not settings.global["ssp-td-default-full-stack"].value then return end
+
+        local entity = event.entity or event.created_entity
+        if not (entity and entity.valid) then return end
+        if not requester_depot_names[entity.name] then return end
+
+        -- If the entity was placed from a blueprint, event.tags will carry
+        -- the saved depot config. Don't override the blueprint's setting.
+        if event.tags and event.tags.transport_depot_tags then
+            return
+        end
+
+        -- Use a next-tick callback so Transport Drones has finished
+        -- creating its depot data structure before we modify it.
+        local unit_number = entity.unit_number
+        script.on_nth_tick(1, function()
+            script.on_nth_tick(1, nil)  -- unregister immediately
+            if remote.interfaces["transport_drones"] and remote.interfaces["transport_drones"]["set_full_stack_only"] then
+                remote.call("transport_drones", "set_full_stack_only", unit_number, true)
+            end
+        end)
+    end
+
+    script.on_event(defines.events.on_built_entity, on_depot_built)
+end
