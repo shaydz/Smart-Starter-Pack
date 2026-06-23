@@ -62,6 +62,8 @@ end
 if mods["space-exploration"] and settings.startup["ssp-se-multiply-landfill"].value then
   local multiplier = settings.startup["ssp-se-landfill-multiplier"].value
   
+  local max_amount = 65535  -- Factorio's 16-bit cap on recipe result amounts
+
   local function multiply_landfill_results(results_table)
     local modified = false
     for _, result in pairs(results_table) do
@@ -69,12 +71,12 @@ if mods["space-exploration"] and settings.startup["ssp-se-multiply-landfill"].va
       local name = result.name or result[1]
       if name == "landfill" then
         if result.amount then
-          result.amount = result.amount * multiplier
+          result.amount = math.min(result.amount * multiplier, max_amount)
         elseif result[2] then
-          result[2] = result[2] * multiplier
+          result[2] = math.min(result[2] * multiplier, max_amount)
         elseif result.amount_min and result.amount_max then
-          result.amount_min = result.amount_min * multiplier
-          result.amount_max = result.amount_max * multiplier
+          result.amount_min = math.min(result.amount_min * multiplier, max_amount)
+          result.amount_max = math.min(result.amount_max * multiplier, max_amount)
         end
         modified = true
       end
@@ -89,7 +91,7 @@ if mods["space-exploration"] and settings.startup["ssp-se-multiply-landfill"].va
     elseif block.result == "landfill" then
       -- Convert shorthand `result="landfill"` to robust `results` table
       local count = block.result_count or 1
-      block.results = {{type="item", name="landfill", amount=count * multiplier}}
+      block.results = {{type="item", name="landfill", amount=math.min(count * multiplier, max_amount)}}
       block.result = nil
       block.result_count = nil
       modified = true
