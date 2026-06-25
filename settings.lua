@@ -122,5 +122,53 @@ data:extend({
     name = "ssp-td-streamline-techs",
     setting_type = "startup",
     default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-k2-revert-electrolysis-power",
+    setting_type = "startup",
+    default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-k2-revert-robot-stats",
+    setting_type = "startup",
+    default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-k2-revert-fuel-refinery",
+    setting_type = "startup",
+    default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-k2-revert-condenser",
+    setting_type = "startup",
+    default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-k2-revert-water-recipes",
+    setting_type = "startup",
+    default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-k2-revert-advanced-buildings",
+    setting_type = "startup",
+    default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-k2-revert-void-crushing",
+    setting_type = "startup",
+    default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-k2-revert-stack-sizes",
+    setting_type = "startup",
+    default_value = true
   }
 })

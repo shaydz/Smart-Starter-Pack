@@ -223,3 +223,263 @@ if mods["Transport_Drones_Continued"] and settings.startup["ssp-td-streamline-te
   disable_tech("transport-buffering")
   disable_tech("transport-active-supply")
 end
+
+-- =====================================================
+-- SPACE EXPLORATION + KRASTORIO 2: Nerf Reverts
+-- Reverts various nerfs applied to K2 by SE.
+-- =====================================================
+if mods["space-exploration"] and has_k2 then
+  
+  local all_effects = { "consumption", "speed", "productivity", "pollution", "quality" }
+  
+  -- 1. Electrolysis Plant Power
+  if settings.startup["ssp-se-k2-revert-electrolysis-power"].value then
+    local ep = data.raw["assembling-machine"]["kr-electrolysis-plant"]
+    if ep then
+      ep.energy_usage = "375kW"
+      ep.allowed_effects = all_effects
+    end
+    local eps = data.raw["assembling-machine"]["kr-electrolysis-plant-spaced"]
+    if eps then
+      eps.energy_usage = "375kW"
+      eps.allowed_effects = all_effects
+    end
+  end
+  
+  -- 2. Robot Stats
+  if settings.startup["ssp-se-k2-revert-robot-stats"].value then
+    local logi = data.raw["logistic-robot"]["logistic-robot"]
+    if logi then
+      logi.speed = 0.0694
+      logi.max_energy = "3MJ"
+      logi.max_payload_size = 7
+    end
+    local cons = data.raw["construction-robot"]["construction-robot"]
+    if cons then
+      cons.speed = 0.09257
+      cons.max_energy = "3MJ"
+      cons.max_payload_size = 2
+    end
+  end
+  
+  -- 3. Fuel Refinery
+  if settings.startup["ssp-se-k2-revert-fuel-refinery"].value then
+    local fr = data.raw["assembling-machine"]["kr-fuel-refinery"]
+    if fr then
+      fr.crafting_speed = 1
+      fr.energy_usage = "250kW"
+      fr.allowed_effects = all_effects
+    end
+    local frs = data.raw["assembling-machine"]["kr-fuel-refinery-spaced"]
+    if frs then
+      frs.crafting_speed = 1
+      frs.energy_usage = "250kW"
+      frs.allowed_effects = all_effects
+    end
+  end
+  
+
+  
+  -- 5. Atmospheric Condenser
+  if settings.startup["ssp-se-k2-revert-condenser"].value then
+    local ac = data.raw["assembling-machine"]["kr-atmospheric-condenser"]
+    if ac then
+      ac.energy_usage = "250kW"
+      ac.allowed_effects = all_effects
+    end
+  end
+  
+  -- 6. Water Recipes
+  if settings.startup["ssp-se-k2-revert-water-recipes"].value then
+    local we = data.raw.recipe["kr-water-electrolysis"]
+    if we then
+      we.energy_required = 3
+      if we.results then
+        for _, res in pairs(we.results) do
+          if res.name == "kr-hydrogen" then res.amount = 30 end
+        end
+      end
+    end
+    local ws = data.raw.recipe["kr-water-separation"]
+    if ws then
+      ws.energy_required = 3
+      if ws.ingredients then
+        for _, ing in pairs(ws.ingredients) do
+          if ing.name == "water" then ing.amount = 50 end
+        end
+      end
+    end
+  end
+  
+  -- 7. Advanced Buildings
+  if settings.startup["ssp-se-k2-revert-advanced-buildings"].value then
+    local af = data.raw["assembling-machine"]["kr-advanced-furnace"]
+    if af then
+      af.energy_usage = "2MW"
+      af.crafting_speed = 12
+    end
+    local aam = data.raw["assembling-machine"]["kr-advanced-assembling-machine"]
+    if aam then
+      aam.energy_usage = "0.925MW"
+      aam.crafting_speed = 5
+    end
+    local acp = data.raw["assembling-machine"]["kr-advanced-chemical-plant"]
+    if acp then
+      acp.energy_usage = "1.75MW"
+      acp.crafting_speed = 8
+    end
+    local rs = data.raw["lab"]["kr-research-server"]
+    if rs then
+      rs.energy_usage = "250kW"
+      rs.allowed_effects = all_effects
+    end
+    local qc = data.raw["lab"]["kr-quantum-computer"]
+    if qc then
+      qc.energy_usage = "1MW"
+      qc.allowed_effects = all_effects
+    end
+  end
+  
+  -- 8. Void Crushing Recipes
+  if settings.startup["ssp-se-k2-revert-void-crushing"].value then
+    for name, recipe in pairs(data.raw.recipe) do
+      if name:find("^kr%-crush%-") then
+        recipe.energy_required = 1
+      end
+    end
+  end
+  
+  -- 9. Stack Sizes
+  if settings.startup["ssp-se-k2-revert-stack-sizes"].value then
+    local kr_stack_size_value = 200
+    
+    local target_subgroups = {
+      ["raw-resource"] = true,
+      ["raw-material"] = true,
+      ["intermediate-product"] = true,
+      ["plates"] = true,
+      ["science-pack"] = true,
+      ["ammo"] = true,
+      ["capsule"] = true,
+      ["terrain"] = true,
+    }
+    
+    for _, category in ipairs({"item", "ammo", "tool", "capsule"}) do
+      if data.raw[category] then
+        for name, item in pairs(data.raw[category]) do
+          -- Exclude space exploration's critical fuels to prevent crashes
+          if name ~= "rocket-fuel" and name ~= "nuclear-fuel" then
+            -- If it's a known intermediate/resource subgroup, or if it was one of the explicitly hardcoded ones
+            if (item.subgroup and target_subgroups[item.subgroup]) or string.match(name, "^kr%-") then
+               -- We also boost all Krastorio 2 intermediate items that begin with kr- (excluding machines, belts, etc)
+               -- Wait, K2 prefixes machines with kr- too. Let's strictly rely on subgroup.
+               if item.subgroup and target_subgroups[item.subgroup] then
+                 if not item.stack_size or item.stack_size < kr_stack_size_value then
+                   item.stack_size = kr_stack_size_value
+                 end
+               end
+            end
+          end
+        end
+      end
+    end
+    
+    -- And just manually cover a few specific stragglers that K2 explicitly touched (like plates, barrels, vanilla ores if subgroups changed)
+    local function set_stack(cat, name, size)
+      if data.raw[cat] and data.raw[cat][name] then
+        if not data.raw[cat][name].stack_size or data.raw[cat][name].stack_size < size then
+          data.raw[cat][name].stack_size = size
+        end
+      end
+    end
+    
+    -- Vanilla
+    set_stack("ammo", "artillery-shell", 25)
+    set_stack("capsule", "cliff-explosives", kr_stack_size_value)
+    set_stack("capsule", "raw-fish", 50)
+    set_stack("item", "barrel", 10)
+    set_stack("item", "battery", kr_stack_size_value)
+    set_stack("item", "coal", kr_stack_size_value)
+    set_stack("item", "coke", kr_stack_size_value)
+    set_stack("item", "concrete", kr_stack_size_value)
+    set_stack("item", "copper-ore", kr_stack_size_value)
+    set_stack("item", "copper-plate", kr_stack_size_value)
+    set_stack("item", "depleted-uranium-fuel-cell", 10)
+    set_stack("item", "hazard-concrete", kr_stack_size_value)
+    set_stack("item", "iron-gear-wheel", kr_stack_size_value)
+    set_stack("item", "iron-ore", kr_stack_size_value)
+    set_stack("item", "iron-plate", kr_stack_size_value)
+    set_stack("item", "iron-stick", kr_stack_size_value)
+    set_stack("item", "landfill", kr_stack_size_value)
+    set_stack("item", "low-density-structure", kr_stack_size_value * 0.5)
+    set_stack("item", "nuclear-fuel", 10)
+    set_stack("item", "plastic-bar", kr_stack_size_value)
+    set_stack("item", "processing-unit", kr_stack_size_value)
+    set_stack("item", "refined-concrete", kr_stack_size_value)
+    set_stack("item", "refined-hazard-concrete", kr_stack_size_value)
+    set_stack("item", "steel-plate", kr_stack_size_value)
+    set_stack("item", "stone-brick", kr_stack_size_value)
+    set_stack("item", "stone", kr_stack_size_value)
+    set_stack("item", "stone-wall", kr_stack_size_value)
+    set_stack("item", "sulfur", kr_stack_size_value)
+    set_stack("item", "uranium-235", kr_stack_size_value)
+    set_stack("item", "uranium-238", kr_stack_size_value)
+    set_stack("item", "uranium-fuel-cell", 10)
+    set_stack("item", "uranium-ore", kr_stack_size_value)
+    set_stack("item", "wood", kr_stack_size_value)
+
+    -- K2 explicit overrides just in case subgroup failed
+    set_stack("item", "kr-silicon", kr_stack_size_value)
+    set_stack("item", "kr-quartz", kr_stack_size_value)
+    set_stack("item", "kr-glass", kr_stack_size_value)
+    set_stack("item", "kr-sand", kr_stack_size_value)
+    set_stack("item", "kr-imersite", kr_stack_size_value)
+    set_stack("item", "kr-raw-imersite", kr_stack_size_value)
+    set_stack("item", "kr-enriched-iron", kr_stack_size_value)
+    set_stack("item", "kr-enriched-copper", kr_stack_size_value)
+    set_stack("item", "kr-rare-metals", kr_stack_size_value)
+    set_stack("item", "kr-enriched-rare-metals", kr_stack_size_value)
+    set_stack("item", "kr-lithium-chloride", kr_stack_size_value)
+    set_stack("item", "kr-lithium", kr_stack_size_value)
+    set_stack("item", "kr-lithium-sulfur-battery", kr_stack_size_value)
+    set_stack("item", "kr-tritium", kr_stack_size_value)
+    set_stack("item", "kr-fuel", kr_stack_size_value)
+    set_stack("item", "kr-biofuel", kr_stack_size_value)
+    set_stack("item", "kr-advanced-fuel", kr_stack_size_value)
+    set_stack("item", "kr-coke", kr_stack_size_value)
+    set_stack("item", "kr-biomass", kr_stack_size_value)
+    set_stack("item", "kr-fertilizer", kr_stack_size_value)
+    set_stack("item", "kr-space-research-data", 1000)
+    set_stack("item", "kr-matter-research-data", 200)
+    set_stack("item", "kr-biter-research-data", 200)
+
+    set_stack("item", "kr-advanced-fuel", kr_stack_size_value)
+    set_stack("item", "kr-ai-core", kr_stack_size_value)
+    set_stack("item", "kr-automation-core", kr_stack_size_value)
+    set_stack("item", "kr-blank-tech-card", 200)
+    set_stack("item", "kr-charged-matter-stabilizer", kr_stack_size_value * 0.5)
+    set_stack("item", "kr-electronic-components", kr_stack_size_value)
+    set_stack("item", "kr-energy-control-unit", kr_stack_size_value * 0.5)
+    set_stack("item", "kr-imersite-crystal", kr_stack_size_value * 0.5)
+    set_stack("item", "kr-imersite-powder", kr_stack_size_value)
+    set_stack("item", "kr-imersium-beam", kr_stack_size_value)
+    set_stack("item", "kr-imersium-gear-wheel", kr_stack_size_value)
+    set_stack("item", "kr-imersium-plate", kr_stack_size_value)
+    set_stack("item", "kr-inserter-parts", kr_stack_size_value)
+    set_stack("item", "kr-iron-beam", kr_stack_size_value)
+    set_stack("item", "kr-black-reinforced-plate", kr_stack_size_value)
+    set_stack("item", "kr-white-reinforced-plate", kr_stack_size_value)
+    set_stack("item", "kr-matter-cube", kr_stack_size_value)
+    set_stack("item", "kr-matter-stabilizer", kr_stack_size_value * 0.5)
+    set_stack("item", "kr-pollution-filter", kr_stack_size_value * 0.5)
+    set_stack("item", "kr-steel-beam", kr_stack_size_value)
+    set_stack("item", "kr-steel-gear-wheel", kr_stack_size_value)
+    set_stack("item", "kr-used-pollution-filter", kr_stack_size_value * 0.5)
+    set_stack("tool", "kr-optimization-tech-card", 200)
+    set_stack("tool", "kr-advanced-tech-card", 200)
+    set_stack("tool", "kr-basic-tech-card", 200)
+    set_stack("tool", "kr-matter-tech-card", 200)
+    set_stack("tool", "kr-singularity-tech-card", 200)
+    
+  end
+end
