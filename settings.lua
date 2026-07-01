@@ -170,5 +170,11 @@ data:extend({
     name = "ssp-se-k2-revert-stack-sizes",
     setting_type = "startup",
     default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-combine-logistic-containers",
+    setting_type = "startup",
+    default_value = true
   }
 })
