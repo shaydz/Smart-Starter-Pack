@@ -176,5 +176,11 @@ data:extend({
     name = "ssp-combine-logistic-containers",
     setting_type = "startup",
     default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-space-loader-with-space-belt",
+    setting_type = "startup",
+    default_value = true
   }
 })

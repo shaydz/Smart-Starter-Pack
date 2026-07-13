@@ -530,3 +530,50 @@ if has_k2 then
     end
   end
 end
+
+if mods["space-exploration"] and mods["aai-loaders"] then
+  if settings.startup["ssp-se-space-loader-with-space-belt"].value then
+    local tech1 = data.raw.technology["se-space-belt"]
+    local tech2 = data.raw.technology["aai-se-space-loader"]
+    if tech1 and tech2 then
+      -- Move effects from tech2 to tech1
+      if tech2.effects then
+        tech1.effects = tech1.effects or {}
+        for _, effect in pairs(tech2.effects) do
+          table.insert(tech1.effects, effect)
+        end
+        tech2.effects = {}
+      end
+      
+      -- Disable and hide tech2
+      tech2.enabled = false
+      tech2.hidden = true
+      
+      -- Update prerequisites globally
+      for _, tech in pairs(data.raw.technology) do
+        if tech.prerequisites then
+          local has_tech1 = false
+          local has_tech2 = false
+          local tech2_index = nil
+          
+          for i, prereq in ipairs(tech.prerequisites) do
+            if prereq == "se-space-belt" then
+              has_tech1 = true
+            elseif prereq == "aai-se-space-loader" then
+              has_tech2 = true
+              tech2_index = i
+            end
+          end
+          
+          if has_tech2 then
+            if has_tech1 then
+              table.remove(tech.prerequisites, tech2_index)
+            else
+              tech.prerequisites[tech2_index] = "se-space-belt"
+            end
+          end
+        end
+      end
+    end
+  end
+end
