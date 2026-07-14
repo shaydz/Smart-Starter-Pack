@@ -576,4 +576,42 @@ if mods["space-exploration"] and mods["aai-loaders"] then
       end
     end
   end
+
+  if settings.startup["ssp-se-cheaper-space-loader"].value then
+    local function sanitize_ingredients(ingredients)
+      if not ingredients then return end
+      local new_ingredients = {}
+      for _, ing in pairs(ingredients) do
+        local name = ing.name or ing[1]
+        local type = ing.type or "item"
+        if name ~= "lubricant" then
+          if ing.name then
+            table.insert(new_ingredients, {type = type, name = name, amount = 1})
+          else
+            table.insert(new_ingredients, {name, 1})
+          end
+        end
+      end
+      return new_ingredients
+    end
+
+    for _, recipe_name in ipairs({"aai-se-space-loader", "aai-se-space-loader-unlubricated"}) do
+      local recipe = data.raw.recipe[recipe_name]
+      if recipe then
+        if recipe.ingredients then
+          recipe.ingredients = sanitize_ingredients(recipe.ingredients)
+        end
+        if recipe.normal then
+          if recipe.normal.ingredients then
+            recipe.normal.ingredients = sanitize_ingredients(recipe.normal.ingredients)
+          end
+        end
+        if recipe.expensive then
+          if recipe.expensive.ingredients then
+            recipe.expensive.ingredients = sanitize_ingredients(recipe.expensive.ingredients)
+          end
+        end
+      end
+    end
+  end
 end

@@ -182,5 +182,11 @@ data:extend({
     name = "ssp-se-space-loader-with-space-belt",
     setting_type = "startup",
     default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-cheaper-space-loader",
+    setting_type = "startup",
+    default_value = true
   }
 })
