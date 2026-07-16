@@ -126,7 +126,20 @@ if mods["space-exploration"] and has_k2 and settings.startup["ssp-se-k2-revert-w
   
   -- 1. Standard Wood (200 water -> 40 wood over 60s)
   local wood_recipe = data.raw.recipe["wood"]
-  if wood_recipe and wood_recipe.category == "kr-growing" then
+  local is_growing = false
+  if wood_recipe then
+    if wood_recipe.category == "kr-growing" then
+      is_growing = true
+    elseif wood_recipe.categories then
+      for _, cat in ipairs(wood_recipe.categories) do
+        if cat == "kr-growing" then
+          is_growing = true
+          break
+        end
+      end
+    end
+  end
+  if is_growing then
     wood_recipe.energy_required = 60
     wood_recipe.ingredients = {
       { type = "fluid", name = "water", amount = 200 }
