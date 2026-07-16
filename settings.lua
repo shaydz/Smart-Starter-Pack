@@ -188,5 +188,11 @@ data:extend({
     name = "ssp-se-cheaper-space-loader",
     setting_type = "startup",
     default_value = true
+  },
+  {
+    type = "bool-setting",
+    name = "ssp-se-k2-revert-steel",
+    setting_type = "startup",
+    default_value = true
   }
 })

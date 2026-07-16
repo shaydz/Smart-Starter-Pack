@@ -165,6 +165,19 @@ if mods["space-exploration"] and has_k2 and settings.startup["ssp-se-k2-revert-w
     fert_recipe.result = nil
     fert_recipe.result_count = nil
   end
+
+  -- 3. Revert greenhouse energy usage to K2 default (144.8kW instead of AAI's 350kW)
+  local greenhouse = data.raw["assembling-machine"]["kr-greenhouse"]
+  if greenhouse then
+    greenhouse.energy_usage = "144.8kW"
+  end
+
+  -- 4. Disable and hide the AAI sand wood recipe
+  local sand_recipe = data.raw.recipe["kr-grow-wood-with-sand"]
+  if sand_recipe then
+    sand_recipe.enabled = false
+    sand_recipe.hidden = true
+  end
 end
 
 -- =====================================================
@@ -330,6 +343,17 @@ if mods["space-exploration"] and has_k2 then
     if af then
       af.energy_usage = "2MW"
       af.crafting_speed = 12
+      -- Ensure advanced furnace can craft kiln recipes (like coke and silicon in SE + K2)
+      if mods["space-exploration"] then
+        af.crafting_categories = af.crafting_categories or {}
+        local has_kiln = false
+        for _, cat in ipairs(af.crafting_categories) do
+          if cat == "kiln" then has_kiln = true break end
+        end
+        if not has_kiln then
+          table.insert(af.crafting_categories, "kiln")
+        end
+      end
     end
     local aam = data.raw["assembling-machine"]["kr-advanced-assembling-machine"]
     if aam then
@@ -626,5 +650,27 @@ if mods["space-exploration"] and mods["aai-loaders"] then
         end
       end
     end
+  end
+end
+
+-- =====================================================
+-- SPACE EXPLORATION + KRASTORIO 2: Steel Recipe Revert
+-- SE nerfs K2's steel recipe by requiring 1.5x more iron plates and coke.
+-- This block restores the recipe to the K2 defaults.
+-- =====================================================
+if mods["space-exploration"] and has_k2 and settings.startup["ssp-se-k2-revert-steel"].value then
+  log("Smart Starter Pack: Reverting steel-plate recipe to Krastorio 2 defaults.")
+  local steel = data.raw.recipe["steel-plate"]
+  if steel then
+    steel.energy_required = 16
+    steel.ingredients = {
+      { type = "item", name = "iron-plate", amount = 10 },
+      { type = "item", name = "kr-coke", amount = 2 },
+    }
+    steel.results = {
+      { type = "item", name = "steel-plate", amount = 5 },
+    }
+    steel.result = nil
+    steel.result_count = nil
   end
 end
