@@ -674,3 +674,16 @@ if mods["space-exploration"] and has_k2 and settings.startup["ssp-se-k2-revert-s
     steel.result_count = nil
   end
 end
+
+-- =====================================================
+-- SPACE EXPLORATION + KRASTORIO 2: Flare Stack in Space
+-- SE blocks K2's flare stack from being placed in space.
+-- This block whitelists the flare stack for space surfaces.
+-- =====================================================
+if mods["space-exploration"] and has_k2 and settings.startup["ssp-se-k2-revert-flare-stack-space"].value then
+  log("Smart Starter Pack: Whitelisting Krastorio 2 flare stack for space.")
+  local flare = data.raw.furnace["kr-flare-stack"]
+  if flare then
+    flare.se_allow_in_space = true
+  end
+end
